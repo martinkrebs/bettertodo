@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Better ToDo List</title>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link rel="stylesheet" href="css/style.css" media="screen" title="no title" charset="utf-8">
+    </head>
+    <body>
+
+    <div class="container">
+        <div class="row">
+            <div id="container" class="col-md-5 col-offset-1">
+                <h1>Better ToDo List</h1>
+                <form action="" method="post">
+                    <input id="todoItem" type="text" name="todoItem" autofocus>
+                    <input id="addTodo" type="button" name="addTodo" value="+">
+                </form>
+                <ul id="todoList" class="sortable list">
+                </ul>
+                <p id="doClearAll">
+                    <a id="clearAll" href="javascript.void()">Clear All</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- jquery from google cdn -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <!-- HTML5Sortable jquery plugin  -->
+    <script type="text/javascript" src="scripts/jquery.sortable.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(e){
+            var Item;
+            var isNewList = true;
+            var todoList = document.getElementById('todoList');
+
+            $('#addTodo').on('click', function(e){
+                e.preventDefault();
+                if(isNewList == true){
+                    var theValue = $('#todoItem').val();
+                    newListItem = '<li><span class="handle"> :: </span><input class="listItem" value="' + theValue + '"><a class="removeListItem" style="display: none:" href="#"> X</a></li>';
+                    isNewList = false;
+                } else {
+                    var theValue = $('#todoItem').val();
+                    newListItem = $('#todoList li:last').clone();
+                    newListItem.find('input').attr('value', theValue);
+                }
+                var theCount = $('#todoList li').length + 1;
+                if(theCount > 1){
+                    $('#doClearAll').css('display', 'block');
+                }
+                $('#todoList').append(newListItem);
+                $('#todoItem').val('');
+                $('#todoItem').focus();
+                // Add our grab handle to sortable for drag functionality
+                $('.sortable').sortable('destroy');
+                $('.sortable').sortable({
+                    handle: '.handle'
+                });
+                localStorage.setItem('betterTodo', todoList.innerHTML);
+            });
+
+            // Handle input field behaviour if return key pressed
+            $('input[type="text"]').on('keydown', function(e){
+                var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
+                if(key == 13){
+                    e.preventDefault();
+                    var inputs = $(this).closest('form').find(':input:visible');
+                    inputs.eq(inputs.index(this) + 1).click();
+                }
+            });
+
+            // Handle any edits to a list item
+            $('#todoList').on('change', '.listItem', function(e){
+                currentValue = $(this).val();
+                $(this).attr('value', currentValue);
+                localStorage.setItem('betterTodo', todoList.innerHTML);
+            });
+
+            // Checks if our list has been resorted, we need this when we come to save out list.
+            $('.sortable').sortable().bind('sortupdate', function(e){
+                localStorage.setItem('betterTodo', todoList.innerHTML);
+            });
+
+            // Show x-del on mouseover
+            $('#todoList').on('mouseover', 'li', function(){
+                var thisA = $(this).find('a');
+                thisA.css('display', 'inline');
+            });
+
+            // Hide x-del on mouseout
+            $('#todoList').on('mouseout', 'li', function(){
+                var thisA = $(this).find('a');
+                thisA.css('display', 'none');
+            });
+
+            // Add click function to x-del
+            $('#todoList').on('click', '.removeListItem', function(e){
+                e.preventDefault();
+                $(this).parent().remove();
+                localStorage.setItem('betterTodo', todoList.innerHTML);
+                var theCount = $('#todoList li').length;
+                if(theCount < 2){
+                    $('#doClearAll').css('display', 'none');
+                }
+                if(theCount == 0) {
+                    isNewList = true;
+                }
+            });
+
+            // ClearAll link functionality
+            $('#doClearAll').on('click', '#clearAll', function(e){
+                e.preventDefault();
+                $('#todoList').children().remove();
+                isNewList= true;
+                $('#todoItem').val('');
+                $('#doClearAll').css('display', 'none');
+                $('#todoItem').focus();
+                localStorage.setItem('betterTodo', todoList.innerHTML);
+            });
+
+            loadTodolist();
+
+            function loadTodolist(){
+                if(localStorage.getItem('betterTodo')){
+                    todoList.innerHTML = localStorage.getItem('betterTodo');
+                    // Add our grab handle to sortable for drag functionality
+                    $('.sortable').sortable('destroy');
+                    $('.sortable').sortable({
+                        handle: '.handle'
+                    });
+                    var theCount = $('#todoList li').length + 1;
+                    if(theCount > 1){
+                        $('#doClearAll').css('display', 'block');
+                    }
+                }
+            }
+
+        });
+    </script>
+
+    </body>
+
+</html>

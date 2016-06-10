@@ -1,0 +1,46 @@
+ul,li {
+    list-style-type: none;
+    list-style-position:inside;
+    margin:0;
+    padding:0;
+}
+
+ul {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* :: grab handle */
+span.handle {
+    color: gray;
+    font-weight: bold;
+    font-size: 1.4em;
+}
+
+/* X Delete and Add  */
+.removeListItem {
+    color: red;
+    font-weight: bold;
+}
+
+#addTodo {
+    color: green;
+    font-weight: bold;
+}
+
+#todoList li {
+    padding: 5px;
+    background-color: lightgray;
+}
+
+.listItem {
+    width: 90%;
+}
+
+#todoItem {
+    margin-right:10px;
+    width: 85%;
+}
+#doClearAll {
+    display: none;
+}
